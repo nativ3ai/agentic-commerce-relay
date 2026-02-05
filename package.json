@@ -1,0 +1,14 @@
+{
+  "name": "agentic-commerce-relay",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Agentic commerce relay: intent -> CCTP transfer -> receipt proof (testnet).",
+  "scripts": {
+    "bridge:cctp": "node ./scripts/cctp-bridge.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "ethers": "^6.11.1"
+  },
+  "license": "MIT"
+}
