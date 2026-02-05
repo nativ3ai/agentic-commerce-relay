@@ -1,15 +1,16 @@
 # Agentic Commerce Relay (CCTP Testnet)
 
-A minimal, verifiable agent commerce flow using Circle CCTP on testnet. This is the **settlement layer**: burn USDC on Base Sepolia, mint on Polygon Amoy, and return machine‑readable receipts.
+A focused, verifiable agent commerce flow using Circle CCTP on testnet. This is the **settlement layer**: burn USDC on Base Sepolia, mint on Polygon Amoy, and return machine‑readable receipts.
 
 ## What it does
 - Burns USDC on Base Sepolia
 - Fetches attestation from Circle Iris
 - Mints USDC on Polygon Amoy
 - Outputs proof (burn tx, message hash, mint tx)
+- Optional discovery adapter for counterparties
 
 ## Why it matters for agents
-This is the smallest reliable primitive for **agent‑to‑agent cross‑chain settlement**. A buyer agent pays on Base Sepolia, a seller agent receives on Amoy, and the bridge is verifiable via Circle attestation.
+This is the smallest reliable primitive for **agent‑to‑agent cross‑chain settlement**. A buyer agent pays on Base Sepolia, a seller agent receives on Amoy, and the bridge is verifiable via Circle attestation, with optional discovery to find counterparties.
 
 ## Plug‑and‑play
 - No contracts to deploy
