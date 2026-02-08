@@ -32,11 +32,16 @@ async function main() {
   const token = process.env.MOLTBOOK_API_KEY;
   if (!token) throw new Error('MOLTBOOK_API_KEY is required');
 
+  const baseUrl = (process.env.MOLTBOOK_BASE_URL || 'https://www.moltbook.com').replace(/\/$/, '');
+  if (!baseUrl.startsWith('https://www.moltbook.com')) {
+    throw new Error('MOLTBOOK_BASE_URL must use https://www.moltbook.com (www required)');
+  }
+
   const sort = arg('sort', 'new');
   const submolt = arg('submolt', 'usdc');
   const tag = (arg('tag', '') || '').toLowerCase();
 
-  const url = `https://www.moltbook.com/api/v1/submolts/${submolt}/feed?sort=${encodeURIComponent(sort)}`;
+  const url = `${baseUrl}/api/v1/submolts/${submolt}/feed?sort=${encodeURIComponent(sort)}`;
   const res = await get(url, token);
   const items = res?.posts || res || [];
 

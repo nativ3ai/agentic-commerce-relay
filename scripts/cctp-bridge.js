@@ -1,23 +1,22 @@
 import axios from 'axios';
 import { ethers } from 'ethers';
 
-const BASE_RPC = process.env.BASE_RPC;
-const AMOY_RPC = process.env.AMOY_RPC;
+const SRC_RPC = process.env.SRC_RPC || process.env.BASE_RPC;
+const DST_RPC = process.env.DST_RPC || process.env.AMOY_RPC;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const AMOUNT = BigInt(process.env.AMOUNT || '1000000'); // 1 USDC (6 decimals)
 
-if (!BASE_RPC || !AMOY_RPC || !PRIVATE_KEY) {
-  console.error('Missing BASE_RPC, AMOY_RPC, or PRIVATE_KEY');
+if (!SRC_RPC || !DST_RPC || !PRIVATE_KEY) {
+  console.error('Missing SRC_RPC/DST_RPC (or BASE_RPC/AMOY_RPC), or PRIVATE_KEY');
   process.exit(1);
 }
 
-// Official Circle testnet contracts
-const USDC_BASE_SEPOLIA = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
-const USDC_AMOY = '0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582';
-const TOKEN_MESSENGER_BASE = '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5';
-const MESSAGE_TRANSMITTER_BASE = '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD';
-const MESSAGE_TRANSMITTER_AMOY = '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD';
-const DEST_DOMAIN_AMOY = 7; // Circle domain ID for Polygon Amoy
+// Default demo: Base Sepolia -> Polygon Amoy (override via env vars for any CCTP chain pair)
+const SRC_USDC = process.env.SRC_USDC || '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
+const SRC_TOKEN_MESSENGER = process.env.SRC_TOKEN_MESSENGER || '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5';
+const SRC_MESSAGE_TRANSMITTER = process.env.SRC_MESSAGE_TRANSMITTER || '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD';
+const DST_MESSAGE_TRANSMITTER = process.env.DST_MESSAGE_TRANSMITTER || '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD';
+const DST_DOMAIN = Number(process.env.DST_DOMAIN || 7); // Polygon Amoy domain by default
 
 const ERC20_ABI = [
   'function approve(address spender, uint256 amount) external returns (bool)',
@@ -62,31 +61,31 @@ async function waitForAttestation(messageHash) {
 }
 
 async function main() {
-  const baseProvider = new ethers.JsonRpcProvider(BASE_RPC);
-  const amoyProvider = new ethers.JsonRpcProvider(AMOY_RPC);
-  const baseWallet = new ethers.Wallet(PRIVATE_KEY, baseProvider);
-  const amoyWallet = new ethers.Wallet(PRIVATE_KEY, amoyProvider);
-  const recipient = baseWallet.address;
+  const srcProvider = new ethers.JsonRpcProvider(SRC_RPC);
+  const dstProvider = new ethers.JsonRpcProvider(DST_RPC);
+  const srcWallet = new ethers.Wallet(PRIVATE_KEY, srcProvider);
+  const dstWallet = new ethers.Wallet(PRIVATE_KEY, dstProvider);
+  const recipient = srcWallet.address;
 
-  const usdc = new ethers.Contract(USDC_BASE_SEPOLIA, ERC20_ABI, baseWallet);
+  const usdc = new ethers.Contract(SRC_USDC, ERC20_ABI, srcWallet);
   if (!process.env.SKIP_APPROVE) {
-    const approveTx = await usdc.approve(TOKEN_MESSENGER_BASE, AMOUNT);
+    const approveTx = await usdc.approve(SRC_TOKEN_MESSENGER, AMOUNT);
     await approveTx.wait();
   }
 
-  const tokenMessenger = new ethers.Contract(TOKEN_MESSENGER_BASE, TOKEN_MESSENGER_ABI, baseWallet);
+  const tokenMessenger = new ethers.Contract(SRC_TOKEN_MESSENGER, TOKEN_MESSENGER_ABI, srcWallet);
   const burnTx = await tokenMessenger.depositForBurn(
     AMOUNT,
-    DEST_DOMAIN_AMOY,
+    DST_DOMAIN,
     toBytes32Address(recipient),
-    USDC_BASE_SEPOLIA
+    SRC_USDC
   );
   const burnReceipt = await burnTx.wait();
 
   const mtInterface = new ethers.Interface(MESSAGE_TRANSMITTER_ABI);
   let messageBytes;
   for (const log of burnReceipt.logs) {
-    if (log.address.toLowerCase() !== MESSAGE_TRANSMITTER_BASE.toLowerCase()) continue;
+    if (log.address.toLowerCase() !== SRC_MESSAGE_TRANSMITTER.toLowerCase()) continue;
     const parsed = mtInterface.parseLog(log);
     if (parsed?.name === 'MessageSent') {
       messageBytes = parsed.args.message;
@@ -102,9 +101,9 @@ async function main() {
   const attestation = await waitForAttestation(messageHash);
 
   const messageTransmitter = new ethers.Contract(
-    MESSAGE_TRANSMITTER_AMOY,
+    DST_MESSAGE_TRANSMITTER,
     MESSAGE_TRANSMITTER_ABI,
-    amoyWallet
+    dstWallet
   );
   const mintTx = await messageTransmitter.receiveMessage(messageBytes, attestation);
   const mintReceipt = await mintTx.wait();

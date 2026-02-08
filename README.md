@@ -1,16 +1,16 @@
-# Agentic Commerce Relay (CCTP Testnet)
+# Agentic Commerce Relay (CCTP Testnet, Multichain‑Ready)
 
-A focused, verifiable agent commerce flow using Circle CCTP on testnet. This is the **settlement layer**: burn USDC on Base Sepolia, mint on Polygon Amoy, and return machine‑readable receipts.
+A focused, verifiable agent commerce flow using Circle CCTP on testnet. This is the **settlement layer**: burn USDC on a source chain, mint on a destination chain, and return machine‑readable receipts. The current script is configured for **Base Sepolia -> Polygon Amoy**, but the flow is **pluggable for any CCTP‑supported chain pair** by swapping RPCs, domain IDs, and contract addresses.
 
 ## What it does
-- Burns USDC on Base Sepolia
+- Burns USDC on a source chain (default: Base Sepolia)
 - Fetches attestation from Circle Iris
-- Mints USDC on Polygon Amoy
+- Mints USDC on a destination chain (default: Polygon Amoy)
 - Outputs proof (burn tx, message hash, mint tx)
 - Optional discovery adapter for counterparties
 
 ## Why it matters for agents
-This is the smallest reliable primitive for **agent‑to‑agent cross‑chain settlement**. A buyer agent pays on Base Sepolia, a seller agent receives on Amoy, and the bridge is verifiable via Circle attestation, with optional discovery to find counterparties.
+This is the smallest reliable primitive for **agent‑to‑agent cross‑chain settlement**. A buyer agent pays on a source chain, a seller agent receives on a destination chain, and the bridge is verifiable via Circle attestation, with optional discovery to find counterparties.
 
 ## Plug‑and‑play
 - No contracts to deploy
@@ -19,10 +19,10 @@ This is the smallest reliable primitive for **agent‑to‑agent cross‑chain s
 
 ## Flow
 ```text
-Buyer Agent (Base Sepolia)
+Buyer Agent (Source Chain)
   -> USDC burn via TokenMessenger
   -> Circle Iris attestation
-  -> Mint on Polygon Amoy via MessageTransmitter
+  -> Mint on Destination Chain via MessageTransmitter
   -> Receipt JSON (burn tx, message hash, mint tx)
 
 Optional modules:
@@ -31,13 +31,45 @@ Optional modules:
   Discovery adapter -> find counterparties
 ```
 
-## Run
+## Run (Base Sepolia -> Polygon Amoy demo)
 ```bash
 npm install
-BASE_RPC=https://base-sepolia.g.alchemy.com/v2/XXX \
-AMOY_RPC=https://polygon-amoy.g.alchemy.com/v2/XXX \
+SRC_RPC=https://base-sepolia.g.alchemy.com/v2/XXX \
+DST_RPC=https://polygon-amoy.g.alchemy.com/v2/XXX \
 PRIVATE_KEY=0x... \
 AMOUNT=1000000 \
+node scripts/cctp-bridge.js
+```
+
+## Multichain configuration (CCTP)
+To use a different CCTP chain pair, set the env vars below (defaults are Base Sepolia -> Polygon Amoy).
+
+Required:
+- `SRC_RPC`
+- `DST_RPC`
+- `PRIVATE_KEY`
+
+Legacy (still supported):
+- `BASE_RPC` (maps to `SRC_RPC`)
+- `AMOY_RPC` (maps to `DST_RPC`)
+
+Optional (override per chain):
+- `SRC_USDC`
+- `SRC_TOKEN_MESSENGER`
+- `SRC_MESSAGE_TRANSMITTER`
+- `DST_MESSAGE_TRANSMITTER`
+- `DST_DOMAIN`
+
+Example (replace with actual CCTP testnet/mainnet values):
+```bash
+SRC_RPC=https://source-chain-rpc \
+DST_RPC=https://dest-chain-rpc \
+SRC_USDC=0x... \
+SRC_TOKEN_MESSENGER=0x... \
+SRC_MESSAGE_TRANSMITTER=0x... \
+DST_MESSAGE_TRANSMITTER=0x... \
+DST_DOMAIN=7 \
+PRIVATE_KEY=0x... \
 node scripts/cctp-bridge.js
 ```
 
@@ -48,9 +80,36 @@ Use a lightweight discovery layer so agents can find counterparties. This repo i
 MOLTBOOK_API_KEY=... node scripts/discovery-moltbook.cjs --submolt usdc --sort new --tag payment
 ```
 
+Notes:
+- Moltbook requires the `www` domain for auth headers: `https://www.moltbook.com`.
+- Optional override: `MOLTBOOK_BASE_URL=https://www.moltbook.com`.
+
 ## Composability with other modules
-- **USDC Intent Payer (Skill)**: turns natural‑language or JSON intents into safe, guarded payments on Base Sepolia, then call this relay to settle on another chain.
-- **Anon x402 Pool (SmartContract + Adapter)**: add privacy to agent commerce by depositing/withdrawing via ZK proofs, then bridge out with this relay.
+- **USDC Intent Payer** (`https://github.com/nativ3ai/usdc-intent-payer`): turns natural‑language or JSON intents into safe, guarded payments on the source chain, then call this relay to settle on another chain. Local integration target: `/Users/native/Desktop/MVP`.
+- **Anon x402 Relay** (`/Users/native/Desktop/anonx402-hackathon`): use as an anonymity relay to shield transactions before or after settlement, then bridge with this relay.
+
+These are composable workflow‑level integrations: plug the intent payer or anon relay into your agent pipeline, then call `scripts/cctp-bridge.js` to finalize cross‑chain settlement.
+
+### Integration snippets
+Intent payer -> relay:
+```bash
+cd /Users/native/Desktop/MVP
+# Example: produce a guarded USDC payment intent on the source chain
+node scripts/usdc-intent-payer.js --to 0xRecipient --amount 1.0 --chain source
+
+cd /Users/native/Desktop/agentic-commerce-relay
+SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js
+```
+
+Anon relay -> relay:
+```bash
+cd /Users/native/Desktop/anonx402-hackathon
+# Example: deposit/withdraw via anon relay before settlement
+node scripts/anon-relay.js --action deposit --amount 1.0
+
+cd /Users/native/Desktop/agentic-commerce-relay
+SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js
+```
 
 ## Proofs (testnet)
 ```text
@@ -64,7 +123,7 @@ Polygon Amoy mint tx:
 0xb5231e50c20ca3fe9eaf17ece4d7e528e83b320045cac10f6c110259c1dcabd2
 ```
 
-## Testnet contracts (official Circle)
+## Testnet contracts (official Circle, current demo)
 - TokenMessenger (v1): `0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5`
 - MessageTransmitter: `0x7865fAfC2db2093669d92c0F33AeEF291086BEFD`
 - USDC Base Sepolia: `0x036CbD53842c5426634e7929541eC2318f3dCF7e`
