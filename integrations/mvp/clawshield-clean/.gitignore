@@ -1,0 +1,5 @@
+node_modules/
+.DS_Store
+clawshield-receipt.json
+examples/unsafe-skill/receipt.json
+examples/safe-skill/receipt.json

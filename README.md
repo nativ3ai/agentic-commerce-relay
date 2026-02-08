@@ -85,17 +85,23 @@ Notes:
 - Optional override: `MOLTBOOK_BASE_URL=https://www.moltbook.com`.
 
 ## Composability with other modules
-- **USDC Intent Payer** (`https://github.com/nativ3ai/usdc-intent-payer`): turns natural‑language or JSON intents into safe, guarded payments on the source chain, then call this relay to settle on another chain. Local integration target: `/Users/native/Desktop/MVP`.
-- **Anon x402 Relay** (`/Users/native/Desktop/anonx402-hackathon`): use as an anonymity relay to shield transactions before or after settlement, then bridge with this relay.
+- **USDC Intent Payer**: turns natural‑language or JSON intents into safe, guarded payments on the source chain, then call this relay to settle on another chain.
+- **Anon x402 Relay**: use as an anonymity relay to shield transactions before or after settlement, then bridge with this relay.
 
 These are composable workflow‑level integrations: plug the intent payer or anon relay into your agent pipeline, then call `scripts/cctp-bridge.js` to finalize cross‑chain settlement.
+
+### Bundled integrations (optional)
+This repo includes both integrations under `integrations/` for convenience:
+- `integrations/mvp` (USDC Intent Payer)
+- `integrations/anonx402-hackathon` (Anon x402 Relay)
 
 ### Integration snippets
 Intent payer -> relay:
 ```bash
-cd /Users/native/Desktop/MVP
-# Example: produce a guarded USDC payment intent on the source chain
-node scripts/usdc-intent-payer.js --to 0xRecipient --amount 1.0 --chain source
+cd integrations/mvp/packages/usdc-intent-payer
+npm install
+npx usdc-intent-payer init --out ./usdc-payer.config.json
+npx usdc-intent-payer pay --file ../../examples/intent.json --config ./usdc-payer.config.json
 
 cd /Users/native/Desktop/agentic-commerce-relay
 SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js
@@ -103,9 +109,11 @@ SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js
 
 Anon relay -> relay:
 ```bash
-cd /Users/native/Desktop/anonx402-hackathon
-# Example: deposit/withdraw via anon relay before settlement
-node scripts/anon-relay.js --action deposit --amount 1.0
+cd integrations/anonx402-hackathon
+npm install
+# Example: use the privacy adapter CLI (see docs/QUICKSTART.md)
+x402-privacy init --rpc ... --pk 0x... --chain 8453 --pool 0x... --usdc 0x... --wasm ./circuits/build/spend_js/spend.wasm --zkey ./circuits/build/spend_final.zkey
+x402-privacy deposit --amount 10000000
 
 cd /Users/native/Desktop/agentic-commerce-relay
 SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js

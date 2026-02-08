@@ -1,0 +1,10 @@
+{
+  "baseTestnet": {
+    "verifier": "0x77e1a4bD3654A0A843B40043e1f35d6eaAC0e0BA",
+    "poseidon": "0x37d0260Bc5efbC3744a40a6f566da71b0112b6E7",
+    "pool": "0xB305F2f742f1a854fa0E2980a1f6bC89F68FD134",
+    "usdc": "0x810a4aCEbBf3DE27BC4EfB05b6CF126105E779E9",
+    "minAnonSet": 8,
+    "minConfirmations": 4
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "status": "blocked",
+  "reason": "ClawShield blocked: readFileSync /Users/native/.clawdbot/.env",
+  "manifest": "/Users/native/Desktop/MVP/clawshield/examples/unsafe-skill/permissions.json",
+  "manifest_hash": "2c4afbe3ae69694655786b454122dbf395a62f015eb89769996416d107e4d46e",
+  "timestamp": "2026-02-06T02:34:34.362Z"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "x402-privacy-mcp-server",
+  "version": "0.2.2",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "x402-privacy-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "x402-privacy-adapter": "0.2.1"
+  },
+  "devDependencies": {
+    "x402-privacy-adapter": "file:../x402-privacy-adapter"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nativ3ai/x402-privacy-adapter.git"
+  },
+  "homepage": "https://github.com/nativ3ai/x402-privacy-adapter"
+}

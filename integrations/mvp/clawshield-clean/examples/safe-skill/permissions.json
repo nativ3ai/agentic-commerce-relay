@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "permissions": {
+    "fs": { "read": ["./examples/safe-skill"], "write": [] },
+    "env": { "allow": [] },
+    "network": { "outbound": [] },
+    "exec": false
+  }
+}

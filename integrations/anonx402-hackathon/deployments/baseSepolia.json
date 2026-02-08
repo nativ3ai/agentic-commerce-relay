@@ -1,0 +1,10 @@
+{
+  "baseSepolia": {
+    "verifier": "0x17393FA5A61eeE637Ce023502A2B313dB7779213",
+    "poseidon": "0x6BB172cB5574793e229996AB4156E66ca4C8F056",
+    "pool": "0xdaF47aF5140433f67b76d8aC356F2a6ef9Df2744",
+    "usdc": "0x810a4aCEbBf3DE27BC4EfB05b6CF126105E779E9",
+    "minAnonSet": 2,
+    "minConfirmations": 0
+  }
+}

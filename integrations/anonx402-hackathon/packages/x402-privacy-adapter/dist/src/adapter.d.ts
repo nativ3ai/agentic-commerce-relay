@@ -1,0 +1,30 @@
+import { RequestInit, Response } from 'undici';
+import { AdapterConfig, Note, PayResult, PaymentRequirement, PinnedMerchant } from './types';
+export declare class PrivacyAdapter {
+    private config;
+    private provider;
+    private signer;
+    private pool;
+    private usdc;
+    private store;
+    private merkle;
+    private poseidon;
+    constructor(config: AdapterConfig);
+    init(): Promise<void>;
+    pinMerchant(name: string, url: string, merchantAddress: string): Promise<PinnedMerchant>;
+    listMerchants(): PinnedMerchant[];
+    sync(fromBlock?: number): Promise<void>;
+    getBalance(): Promise<bigint>;
+    depositPack(targetAmount: bigint): Promise<Note[]>;
+    buy(url: string, options?: RequestInit): Promise<Response>;
+    payMerchant(requirement: PaymentRequirement, url: string, method: string): Promise<PayResult>;
+    private poseidonCommitment;
+    private poseidonNullifier;
+    private packDenoms;
+    private selectNotes;
+    private intentHash;
+    private toBytes32;
+    private toAddress;
+    private parsePaymentRequirement;
+    private normalizeRequirement;
+}

@@ -1,0 +1,30 @@
+#USDCHackathon ProjectSubmission SmartContract
+
+## Summary
+Anon x402 Pool is a privacy‑preserving USDC payment pool that lets agents pay x402 merchants without revealing their primary wallet history. Proofs are bound to a canonical x402 intent hash (merchant, URL, price, expiry, method).
+
+## What I Built
+A Groth16‑verified USDC privacy pool (PrivacyPoolUSDC) with Poseidon commitments, nullifiers, and intent‑bound spends. It keeps merchants unchanged (they receive normal USDC) while agents transact privately. Includes a working adapter + local x402 test server to exercise the flow on Base Sepolia.
+
+## How It Functions
+1. Agent deposits fixed‑denomination USDC into the pool, receiving a note commitment.
+2. Agent constructs an intent hash for the x402 request.
+3. A Groth16 proof shows note ownership and binds the intent hash + price + expiry.
+4. The pool pays the merchant in USDC and records nullifiers to prevent double‑spend.
+
+## Proof of Work
+- Contract address (PrivacyPoolUSDC): `0xdaF47aF5140433f67b76d8aC356F2a6ef9Df2744`
+- Chain: Base Sepolia (84532)
+- USDC (custom testnet): `0x810a4aCEbBf3DE27BC4EfB05b6CF126105E779E9`
+- Block explorer (contract): https://sepolia.basescan.org/address/0xdaF47aF5140433f67b76d8aC356F2a6ef9Df2744
+- Deposit txs:
+  - https://sepolia.basescan.org/tx/0x05053cd42bf437c11c49b9c62921e93ddc204835f8ee5a4358d457ab5a2a81b6
+  - https://sepolia.basescan.org/tx/0xf0af52f0a6ad07b65904ace5ddee211329567b4128ee85dd22239599d15fac30
+- Spend tx (intent‑bound payment):
+  - https://sepolia.basescan.org/tx/0x12efdb08bfe2c128a6b612f1432b568cac63dba4fe5ddbbfc9aa33829f1d3df9
+
+## Code
+- GitHub: https://github.com/nativ3ai/anonx402-privacy-pool
+
+## Why It Matters
+Agent commerce needs privacy and safety. This pool gives agents a real, testnet‑ready way to pay merchants without exposing their full transaction history, while still guaranteeing intent‑bound correctness and preventing double‑spends. It’s a composable primitive for agent marketplaces, private paid APIs, and confidential service payments.

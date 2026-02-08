@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "permissions": {
+    "fs": { "read": ["./"], "write": [] },
+    "env": { "allow": [] },
+    "network": { "outbound": [] },
+    "exec": false
+  }
+}

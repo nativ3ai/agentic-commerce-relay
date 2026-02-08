@@ -38,8 +38,8 @@ https://github.com/nativ3ai/agentic-commerce-relay
 
 Related modules (plug‑ins):
 ```
-USDC Intent Payer: https://github.com/nativ3ai/usdc-intent-payer (local integration target: /Users/native/Desktop/MVP)
-Anon x402 Relay: /Users/native/Desktop/anonx402-hackathon
+USDC Intent Payer: https://github.com/nativ3ai/usdc-intent-payer (bundled under integrations/mvp)
+Anon x402 Relay: https://github.com/nativ3ai/anonx402-privacy-pool (bundled under integrations/anonx402-hackathon)
 ```
 
 ## How Agents Use It (Plug‑and‑Play)
@@ -58,8 +58,10 @@ The relay is chain‑agnostic across CCTP‑supported networks. Override these e
 ## Integration snippets
 Intent payer -> relay:
 ```
-cd /Users/native/Desktop/MVP
-node scripts/usdc-intent-payer.js --to 0xRecipient --amount 1.0 --chain source
+cd integrations/mvp/packages/usdc-intent-payer
+npm install
+npx usdc-intent-payer init --out ./usdc-payer.config.json
+npx usdc-intent-payer pay --file ../../examples/intent.json --config ./usdc-payer.config.json
 
 cd /Users/native/Desktop/agentic-commerce-relay
 SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js
@@ -67,8 +69,10 @@ SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js
 
 Anon relay -> relay:
 ```
-cd /Users/native/Desktop/anonx402-hackathon
-node scripts/anon-relay.js --action deposit --amount 1.0
+cd integrations/anonx402-hackathon
+npm install
+x402-privacy init --rpc ... --pk 0x... --chain 8453 --pool 0x... --usdc 0x... --wasm ./circuits/build/spend_js/spend.wasm --zkey ./circuits/build/spend_final.zkey
+x402-privacy deposit --amount 10000000
 
 cd /Users/native/Desktop/agentic-commerce-relay
 SRC_RPC=... DST_RPC=... PRIVATE_KEY=... node scripts/cctp-bridge.js

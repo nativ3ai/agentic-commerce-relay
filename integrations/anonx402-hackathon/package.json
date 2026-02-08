@@ -1,0 +1,39 @@
+{
+  "name": "x402-privacy-pool",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w x402-privacy-adapter && npm run build -w x402-privacy-mcp-server",
+    "lint": "eslint .",
+    "format": "prettier -w .",
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy:base": "hardhat run scripts/deploy.ts --network baseMainnet",
+    "zk:compile": "node circuits/scripts/compile.js",
+    "zk:setup": "node circuits/scripts/setup.js",
+    "zk:export-verifier": "node circuits/scripts/export-verifier.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.5",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^4.3.11",
+    "@types/node": "^20.11.0",
+    "chai": "^4.4.1",
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "hardhat": "^2.22.10",
+    "prettier": "^3.2.5",
+    "snarkjs": "^0.7.4",
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}

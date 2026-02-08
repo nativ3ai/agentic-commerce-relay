@@ -1,0 +1,19 @@
+{
+  "name": "clawshield",
+  "version": "0.1.0",
+  "description": "Skill security guardrails for OpenClaw: scan, lint, and run with enforcement.",
+  "type": "module",
+  "bin": {
+    "clawshield": "bin/clawshield.js"
+  },
+  "scripts": {
+    "lint": "node bin/clawshield.js lint-skillmd skill.md",
+    "scan": "node bin/clawshield.js scan .",
+    "init": "node bin/clawshield.js init"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "fast-glob": "^3.3.2"
+  }
+}
