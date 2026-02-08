@@ -95,6 +95,14 @@ This repo includes both integrations under `integrations/` for convenience:
 - `integrations/mvp` (USDC Intent Payer)
 - `integrations/anonx402-hackathon` (Anon x402 Relay)
 
+## OpenClaw skill
+The relay ships with a skill definition at `skill/agentic-commerce-relay/SKILL.md`.
+To install locally for OpenClaw:
+```bash
+mkdir -p ~/.openclaw/workspace/skills/agentic-commerce-relay
+cp skill/agentic-commerce-relay/SKILL.md ~/.openclaw/workspace/skills/agentic-commerce-relay/SKILL.md
+```
+
 ### Integration snippets
 Intent payer -> relay:
 ```bash
